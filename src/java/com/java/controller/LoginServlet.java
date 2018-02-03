@@ -35,17 +35,14 @@ public class LoginServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        String username = request.getParameter("username"),
-                password = request.getParameter("password");
-
         if (session.getAttribute("user") == null) {
+            
+            String username = request.getParameter("username"),
+                    password = request.getParameter("password");
+
             try {
                 User user = User.login(username, password);
-                //request.setAttribute("username", user.getUsername());
-                //request.setAttribute("password", user.getPassword());
                 session.setAttribute("user", user);
-                request.getRequestDispatcher("success.jsp").forward(request, response);
-                return;
             } catch (WrongUsernameException ex) {
                 session.setAttribute("loginMsg", "The username you entered does not exist.");
                 ex.printStackTrace();
@@ -53,11 +50,16 @@ public class LoginServlet extends HttpServlet {
                 session.setAttribute("loginMsg", "The username and password does not match.");
                 ex.printStackTrace();
             }
+            response.sendRedirect("index.jsp");
+        } else {
+            request.getRequestDispatcher("success.jsp").forward(request, response);
         }
-
-        response.sendRedirect("index.jsp");
     }
 
+    private void successRedirect(HttpServletRequest request, HttpServletResponse response) {
+        
+    }
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
@@ -67,14 +69,11 @@ public class LoginServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    
-    /*
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-    */
 
     /**
      * Handles the HTTP <code>POST</code> method.

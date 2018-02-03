@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -34,6 +36,13 @@ public class User {
     public User(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+    
+    public User(ResultSet rs) throws SQLException {
+        this (
+                rs.getString("username"),
+                rs.getString("password")
+        );
     }
 
     public String getUsername() {
@@ -78,7 +87,7 @@ public class User {
                     if (rs.next()) {
                         if (rs.getString("password").equals(password)) {
                             //return new User(rs.getString("username"), rs.getString("password"));
-                            User user = new User(rs.getString("username"), rs.getString("password"));
+                            User user = new User(rs);
                             return user;
                         } else {
                             throw new WrongPasswordException();
@@ -87,6 +96,23 @@ public class User {
                         throw new WrongUsernameException();
                     }
                 }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+    
+    public static List<User> listUsers() {
+        List<User> results = new ArrayList<>();
+        try (Connection con = Database.getConnection()) {
+            try (PreparedStatement stmt = con.prepareStatement("SELECT * FROM accounts")) {
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        results.add(new User(rs));
+                    }
+                }
+                return results;
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());

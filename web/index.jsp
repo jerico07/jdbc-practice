@@ -17,7 +17,7 @@
 
         <%
             if (session.getAttribute("user") != null) {
-                response.sendRedirect("success.jsp");
+                response.sendRedirect("LoginServlet");
             }
             
             String msg = (String) session.getAttribute("loginMsg");
