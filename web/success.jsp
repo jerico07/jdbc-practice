@@ -52,6 +52,7 @@
                     <th>USERNAME</th>
                     <th>PASSWORD</th>
                     <th>EDIT PASSWORD</th>
+                    <th>DELETE?</th>
                 </tr>
                 <%
                     int i = 0;
@@ -63,7 +64,11 @@
                     <td>
                         <input type="text" value="<%=u.getPassword()%>" name="password<%=i%>">
                     </td>
+                    <td>
+                        <a href=<%=u.getUsername().equals(user.getUsername()) ? "#" :"DeleteServlet?username=" + u.getUsername()%>>DELETE</a>
+                    </td>
                     <input type="hidden" value="<%=u.getUsername()%>" name="username<%=i%>">
+                    
                 </tr>
                 <%
                         i++;

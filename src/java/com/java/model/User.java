@@ -163,6 +163,18 @@ public class User {
         return null;
     }
 
+    public static void deleteUser(String username) {
+        try (Connection con = Database.getConnection()) {
+            try (PreparedStatement stmt = con.prepareStatement("DELETE FROM accounts WHERE username = ?")) {
+                stmt.setString(1, username);
+                stmt.executeUpdate();
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    
     public static User changePassword(String username, String newPassword) {
         try (Connection con = Database.getConnection()) {
             try (PreparedStatement stmt = con.prepareStatement("UPDATE accounts SET password = ? WHERE username = ?")) {
