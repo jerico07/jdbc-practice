@@ -6,21 +6,19 @@
 package com.java.controller;
 
 import com.java.model.User;
-import com.java.model.WrongPasswordException;
-import com.java.model.WrongUsernameException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-// /login
 /**
  *
  * @author User
  */
-public class LoginServlet extends HttpServlet {
+public class ChangePassServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,35 +32,15 @@ public class LoginServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+        if (user != null) {
 
-        if (session.getAttribute("user") == null) {
-
-            String username = request.getParameter("username"),
-                    password = request.getParameter("password");
-
-            try {
-                User user = User.login(username, password);
-                session.setAttribute("user", user);
-                successDispatcher(request, response);
-                return;
-            } catch (WrongUsernameException ex) {
-                session.setAttribute("loginMsg", "The username you entered does not exist.");
-                ex.printStackTrace();
-            } catch (WrongPasswordException ex) {
-                session.setAttribute("loginMsg", "The username and password does not match.");
-                ex.printStackTrace();
-            }
-            response.sendRedirect("index.jsp");
-        } else {
-            successDispatcher(request, response);
-            return;
+            String password = request.getParameter("password");
+            
+            session.setAttribute("user", User.changePassword(user.getUsername(), password));
         }
-    }
 
-    private void successDispatcher(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        request.setAttribute("list", User.listUsers());
-        request.getRequestDispatcher("success.jsp").forward(request, response);
-        return;
+        response.sendRedirect("LoginServlet");
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

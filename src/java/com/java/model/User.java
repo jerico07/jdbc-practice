@@ -37,14 +37,15 @@ public class User {
         this.username = username;
         this.password = password;
     }
-    
+
+    /*
     public User(ResultSet rs) throws SQLException {
         this (
                 rs.getString("username"),
                 rs.getString("password")
         );
     }
-
+     */
     public String getUsername() {
         return username;
     }
@@ -87,7 +88,7 @@ public class User {
                     if (rs.next()) {
                         if (rs.getString("password").equals(password)) {
                             //return new User(rs.getString("username"), rs.getString("password"));
-                            User user = new User(rs);
+                            User user = new User(rs.getString("username"), rs.getString("password"));
                             return user;
                         } else {
                             throw new WrongPasswordException();
@@ -102,18 +103,76 @@ public class User {
         }
         return null;
     }
-    
+
     public static List<User> listUsers() {
         List<User> results = new ArrayList<>();
         try (Connection con = Database.getConnection()) {
             try (PreparedStatement stmt = con.prepareStatement("SELECT * FROM accounts")) {
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {
-                        results.add(new User(rs));
+                        User user = new User(rs.getString("username"), rs.getString("password"));
+                        results.add(user);
                     }
                 }
                 return results;
             }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+
+    public static User register(String username, String password) {
+        try (Connection con = Database.getConnection()) {
+            try (PreparedStatement stmt = con.prepareStatement("INSERT INTO accounts (username, password) VALUES (?, ?)")) {
+                stmt.setString(1, username);
+                stmt.setString(2, password);
+                stmt.executeUpdate();
+            }
+
+            try (PreparedStatement stmt = con.prepareStatement("SELECT * FROM accounts WHERE username = ?")) {
+                stmt.setString(1, username);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        User user = new User(rs.getString("username"), rs.getString("password"));
+                        return user;
+                    }
+                }
+            }
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+
+    public static User readUser(String username) {
+        try (Connection con = Database.getConnection()) {
+            try (PreparedStatement stmt = con.prepareStatement("SELECT * FROM accounts WHERE username = ?")) {
+                stmt.setString(1, username);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        User user = new User(rs.getString("username"), rs.getString("password"));
+                        return user;
+                    }
+                }
+            }
+
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+        return null;
+    }
+
+    public static User changePassword(String username, String newPassword) {
+        try (Connection con = Database.getConnection()) {
+            try (PreparedStatement stmt = con.prepareStatement("UPDATE accounts SET password = ? WHERE username = ?")) {
+                stmt.setString(1, newPassword);
+                stmt.setString(2, username);
+                stmt.executeUpdate();
+            }
+
+            return readUser(username);
+
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
