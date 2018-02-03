@@ -9,9 +9,34 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Log In</title>
     </head>
+
     <body>
-        <h1>Hello World!</h1>
+        <h1>Log In</h1>
+
+        <%
+            if (session.getAttribute("user") != null) {
+                response.sendRedirect("success.jsp");
+            }
+            
+            String msg = (String) session.getAttribute("loginMsg");
+            session.removeAttribute("loginMsg");
+
+            if (msg != null) { %>
+            <%=msg%>
+        <%
+            }
+        %>
+
+        <form method="post" action="LoginServlet">
+            <label for="username">Username:</label><br>
+            <input type="text" name="username" id="username">
+            <br><br>
+            <label for="password">Password:</label><br>
+            <input type="password" name="password" id="password">
+            <br><br>
+            <input type="submit" value="Log In">
+        </form>
     </body>
 </html>

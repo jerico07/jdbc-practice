@@ -8,7 +8,6 @@ package com.java.model;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
  *
@@ -25,7 +24,7 @@ public class Database {
     
     static {
         try {
-            config("com.mysql.jdbc.Driver", "jdbc:mysql:localhost:3306/practice", "root", "password");
+            config("com.mysql.jdbc.Driver", "jdbc:mysql://localhost:3306/practice?zeroDateTimeBehavior=convertToNull", "root", "password");
         } catch (ClassNotFoundException ex) {
             
         }
